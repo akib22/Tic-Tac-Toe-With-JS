@@ -2,7 +2,8 @@
 const board = document.querySelector(".board");
 //select marge line
 const mergeLine = document.querySelector(".merge");
-
+//select winning sound
+const winningSound = document.querySelector(".winning-sound")
 
 // pattern
 const patterns = [
@@ -57,6 +58,7 @@ function matchCheck(playerArr) {
 }
 
 function winnerChecker(patterns) {
+    winningSound.play()
     const patternNum = patterns.join("")
     // add line and line color css class
     mergeLine.className += ` pattern${patternNum} player${playerTurn.toUpperCase()}Color`;
