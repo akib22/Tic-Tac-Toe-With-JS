@@ -118,6 +118,11 @@ i.fa.fa-close {
     color: #77e2b7;
 }
 
+.winner-icon > i.fa.fa-close {
+    font-size: 115px !important;
+    margin-right: 15px;
+}
+
 .merge {
     position: absolute;
     width: 0;

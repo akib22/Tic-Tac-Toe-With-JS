@@ -1,9 +1,12 @@
+
 //select board
 const board = document.querySelector(".board");
 //select marge line
 const mergeLine = document.querySelector(".merge");
 //select winning sound
-const winningSound = document.querySelector(".winning-sound")
+const winningSound = document.querySelector(".winning-sound");
+
+let countClick = 0;
 
 
 
@@ -25,16 +28,25 @@ const checkedCellOfPlayerO = [];
 
 //add event listener to board
 board.addEventListener("click", e => {
-    console.log(e.target);
-    
-    const cellId = Number(e.target.getAttribute("data-cell-id"));
+    countClick++;
 
-    // check cell id is in plyerX or plyerO
-    if (!(checkedCellOfPlayerX.includes(cellId) || checkedCellOfPlayerO.includes(cellId))) {
+    const {
+        className
+    } = e.target
+    const cellId = Number(e.target.getAttribute("data-cell-id"));
+    const checkClickBefore = !(checkedCellOfPlayerX.includes(cellId) || checkedCellOfPlayerO.includes(cellId))
+
+    // check cell id is in plyerX or plyerO 
+    if (className == "cell" && checkClickBefore) {
+
         if (playerTurn === "x") {
             e.target.innerHTML = `<i class="fa fa-close"></i>`;
             checkedCellOfPlayerX.push(cellId);
-            matchCheck(checkedCellOfPlayerX);
+
+            if (countClick > 4) {
+                matchCheck(checkedCellOfPlayerX);
+            }
+
             //change player to O
             playerTurn = "o";
             document.querySelector('.turn').innerHTML = playerTurn.toUpperCase();
@@ -42,26 +54,36 @@ board.addEventListener("click", e => {
         } else if (playerTurn === "o") {
             e.target.innerHTML = `<i class="fa fa-circle-o"></i>`
             checkedCellOfPlayerO.push(cellId);
-            matchCheck(checkedCellOfPlayerO)
+
+            if (countClick > 4) {
+                matchCheck(checkedCellOfPlayerO)
+            }
 
             //change player to X
             playerTurn = "x";
             document.querySelector('.turn').innerHTML = playerTurn.toUpperCase();
         }
     }
+
 });
 
 function matchCheck(playerArr) {
     for (let k = 0; k < patterns.length; k++) {
         let hasIt = patterns[k].reduce((total, i) => total && playerArr.includes(i), true);
+
         if (hasIt) {
-            winnerChecker(patterns[k])
+            return winnerChecker(patterns[k])
         }
+    }
+    if (countClick === 9) {
+        return draw();
     }
     return false
 }
 
 function winnerChecker(patterns) {
+    // user will not be able to click any more
+    board.style = "pointer-events: none;"
     // play winning sound
     winningSound.play()
     const patternNum = patterns.join("")
@@ -74,18 +96,36 @@ function winnerChecker(patterns) {
                     }`
     // add keyframes to body
     document.querySelector(".insertKeyframe").innerHTML += keyframes;
-    setTimeout(()=>{
+    setTimeout(() => {
         //fate out for board
         document.querySelector(".turn-and-board").classList.add("fade-out")
         //winner icon 
-        const winnerIcon = `<i class="fa fa-${playerTurn == 'o' ? 'close' : 'circle-o' }"></i>`
+        const winnerIcon = `<i class="fa fa-${playerTurn == 'o' ? 'close' : 'circle-o'}"></i>`;
+        // winner or draw
+        document.querySelector(".winnerState").innerText = "WINNER!";
         document.querySelector(".winner-icon").innerHTML = winnerIcon
         // fade in for winner
         document.querySelector(".show-winner").classList.add("fade-in")
 
-    },1000)
+    }, 1000)
 }
 
 //restart game
 
 document.querySelector(".restart").addEventListener("click", () => location.reload())
+
+
+function draw() {
+    setTimeout(() => {
+        //fate out for board
+        document.querySelector(".turn-and-board").classList.add("fade-out")
+        //winner icon 
+        const winnerIcon = `<i class="fa fa-close"></i> <i class="fa fa-circle-o"></i>`;
+        // winner or draw
+        document.querySelector(".winnerState").innerText = "DRAW!";
+        document.querySelector(".winner-icon").innerHTML = winnerIcon
+        // fade in for winner
+        document.querySelector(".show-winner").classList.add("fade-in")
+
+    }, 1000)
+}
